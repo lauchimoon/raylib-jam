@@ -20,7 +20,7 @@ int main()
     screen_init(game.current_screen);
 
 #ifdef WEB
-    emscripten_set_main_loop(run, 0, 1);
+    emscripten_set_main_loop(run, 60, 1);
 #else
     SetTargetFPS(60);
 
