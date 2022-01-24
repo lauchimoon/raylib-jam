@@ -32,9 +32,9 @@ void init_game(Game *game)
     game->unlocked_bg[1] = false;
     game->unlocked_bg[2] = false;
     game->unlocked_bg[3] = false;
-    game->volume = 1.0f;
-    game->sound_volume = 1.0f;
-    game->music_volume = 1.0f;
+    emsave_f("master_volume", 1.0f);
+    emsave_f("sound_volume", 1.0f);
+    emsave_f("music_volume", 1.0f);
 #endif
     game->frames_counter = 0;
     transition_texture = LoadTexture("assets/transition_animation.png");
