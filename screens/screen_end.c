@@ -124,7 +124,11 @@ void screen_end_draw(Game *game)
         }
     }
     if (show_pro) {
-        DrawTextCentered(pro_tips[pro_tip], GetScreenHeight() - 70, 30, WHITE);
+        if (game->mode == MODE_INSANE && !game->player.lost) {
+            DrawTextCentered("YOU ARE THE BEST!!!", GetScreenHeight() - 70, 40, WHITE);
+        } else {
+            DrawTextCentered(pro_tips[pro_tip], GetScreenHeight() - 70, 30, WHITE);
+        }
     }
 }
 
