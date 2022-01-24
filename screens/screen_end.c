@@ -14,7 +14,6 @@ static const char *pro_tips[AMOUNT_PRO_TIPS] = {
     "Pro Tip: git gud",
     "Pro Tip: Be fast!",
     "Pro Tip: Dodge!",
-    "Insane mode may be hard but not impossible. Do not give up."
 };
 
 static bool show_score_won = false;
@@ -125,11 +124,7 @@ void screen_end_draw(Game *game)
         }
     }
     if (show_pro) {
-        if (game->mode != MODE_INSANE) {
-            DrawTextCentered(pro_tips[pro_tip], GetScreenHeight() - 70, 30, WHITE);
-        } else {
-            DrawTextCentered(pro_tips[5], GetScreenHeight() - 70, 20, RED);
-        }
+        DrawTextCentered(pro_tips[pro_tip], GetScreenHeight() - 70, 30, WHITE);
     }
 }
 
