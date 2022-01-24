@@ -61,7 +61,8 @@ static Sound warning_up_sound = { 0 };
 static Sound warning_left_sound = { 0 };
 static Sound warning_right_sound = { 0 };
 
-static Music music = { 0 };
+static Music music_normal = { 0 };
+static Music music_insane = { 0 };
 
 static int frames_counter = 0;
 static int frames_counter_time = 0;
@@ -173,10 +174,16 @@ void screen_game_init(Game *game)
         backgrounds[i] = LoadTexture(TextFormat("assets/bg_%d.png", i));
     }
 
-    music = LoadMusicStream("assets/song_game.mp3");
+    music_normal = LoadMusicStream("assets/song_game.mp3");
+    music_insane = LoadMusicStream("assets/song_insane.mp3");
 
-    PlayMusicStream(music);
-    SetMusicVolume(music, game->music_volume);
+    if (game->mode != MODE_INSANE) {
+        PlayMusicStream(music_normal);
+    } else {
+        PlayMusicStream(music_insane);
+    }
+    SetMusicVolume(music_normal, game->music_volume);
+    SetMusicVolume(music_insane, game->music_volume);
 
     SetSoundVolume(warning_sound, game->sound_volume);
     SetSoundVolume(warning2_sound, game->sound_volume);
@@ -198,7 +205,11 @@ void screen_game_init(Game *game)
 
 void screen_game_update(Game *game)
 {
-    UpdateMusicStream(music);
+    if (game->mode != MODE_INSANE) {
+        UpdateMusicStream(music_normal);
+    } else {
+        UpdateMusicStream(music_insane);
+    }
 
     // player input
     if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
@@ -451,7 +462,8 @@ void screen_game_deinit(Game *game)
     UnloadSound(warning_right_sound);
     UnloadSound(punch_sound);
     UnloadSound(hit_sound);
-    UnloadMusicStream(music);
+    UnloadMusicStream(music_normal);
+    UnloadMusicStream(music_insane);
 
     for (int i = 0; i < AMOUNT_BACKGROUNDS; i++) {
         UnloadTexture(backgrounds[i]);

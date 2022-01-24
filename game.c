@@ -23,6 +23,9 @@ void init_game(Game *game)
 #ifdef WEB
     emsave("mode_survival", true);
     emsave("bg_0", true);
+    emsave_f("master_volume", 1.0f);
+    emsave_f("sound_volume", 1.0f);
+    emsave_f("music_volume", 1.0f);
 #else
     game->unlocked_modes[MODE_SURVIVAL] = true;
     game->unlocked_modes[MODE_INFINITE] = false;
@@ -32,9 +35,9 @@ void init_game(Game *game)
     game->unlocked_bg[1] = false;
     game->unlocked_bg[2] = false;
     game->unlocked_bg[3] = false;
-    emsave_f("master_volume", 1.0f);
-    emsave_f("sound_volume", 1.0f);
-    emsave_f("music_volume", 1.0f);
+    game->volume = 1.0f;
+    game->sound_volume = 1.0f;
+    game->music_volume = 1.0f;
 #endif
     game->frames_counter = 0;
     transition_texture = LoadTexture("assets/transition_animation.png");
