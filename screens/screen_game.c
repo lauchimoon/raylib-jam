@@ -1,10 +1,16 @@
 #include "engine.h"
 #include "raylib.h"
+#include <stdio.h>
 
 #define AMOUNT_FISTS         4
 #define AMOUNT_PLAYER_STATES 5
 #define COOLDOWN             45
 #define SHAKE_OFFSET         50
+
+typedef enum {
+    STATE_DODGING = 0,
+    STATE_IDLE
+} PlayerStates;
 
 typedef enum {
     FIST_PLACE_UP = 0,
@@ -60,6 +66,7 @@ static Sound warning_right_sound = { 0 };
 
 static Music music_normal = { 0 };
 static Music music_normal2 = { 0 };
+static Music music_normal3 = { 0 };
 static Music music_insane = { 0 };
 
 static int frames_counter = 0;
@@ -75,9 +82,10 @@ static Camera2D camera = { 0 }; // shake effect
 static Sound warning_sounds[4] = { 0 };
 
 static int music_idx = 0;
+static int player_lock_counter = 0;
 
 static Texture backgrounds[AMOUNT_BACKGROUNDS] = { 0 };
-static Music musics[5] = { 0 };
+static Music musics[3] = { 0 };
 
 void screen_game_init(Game *game)
 {
@@ -105,8 +113,9 @@ void screen_game_init(Game *game)
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
     move_to_title = false;
+    player_lock_counter = 0;
 
-    music_idx = GetRandomValue(0, 4);
+    music_idx = GetRandomValue(0, 2);
 
     // initialize structures
     game->player.x = GetScreenWidth()/2;
@@ -179,12 +188,11 @@ void screen_game_init(Game *game)
 
     music_normal = LoadMusicStream("assets/song_game.mp3");
     music_normal2 = LoadMusicStream("assets/song_game2.mp3");
+    music_normal3 = LoadMusicStream("assets/song_game3.mp3");
     music_insane = LoadMusicStream("assets/song_insane.mp3");
     musics[0] = music_normal;
     musics[1] = music_normal2;
-    musics[2] = music_normal;
-    musics[3] = music_normal2;
-    musics[4] = music_normal;
+    musics[2] = music_normal3;
 
     if (game->mode != MODE_INSANE) {
         PlayMusicStream(musics[music_idx]);
@@ -211,6 +219,8 @@ void screen_game_init(Game *game)
     warning_sounds[3] = warning4_sound;
 
     darkness.a = 0;
+    game->player.state = STATE_IDLE;
+    game->player.locked = false;
 }
 
 void screen_game_update(Game *game)
@@ -222,33 +232,52 @@ void screen_game_update(Game *game)
     }
 
     // player input
-    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
-        player_hitbox.y = 75;
-        player_hitbox.height = 65;
-        key_pressed = KEY_W;
-        player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*4;
-    } else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
-        player_hitbox.x = 300;
-        player_hitbox.width = 50;
-        key_pressed = KEY_A;
-        player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*2;
-    } else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-        player_hitbox.y = 305;
-        player_hitbox.height = 50;
-        player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*1;
-        key_pressed = KEY_S;
-    } else if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
-        player_hitbox.x = 450;
-        player_hitbox.width = 50;
-        key_pressed = KEY_D;
-        player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*3;
+    if (!game->player.locked) {
+        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
+            player_hitbox.y = 75;
+            player_hitbox.height = 65;
+            key_pressed = KEY_W;
+            player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*4;
+            player_lock_counter++;
+        } else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
+            player_hitbox.x = 300;
+            player_hitbox.width = 50;
+            key_pressed = KEY_A;
+            player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*2;
+            player_lock_counter++;
+        } else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
+            player_hitbox.y = 305;
+            player_hitbox.height = 50;
+            player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*1;
+            key_pressed = KEY_S;
+            player_lock_counter++;
+        } else if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
+            player_hitbox.x = 450;
+            player_hitbox.width = 50;
+            key_pressed = KEY_D;
+            player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*3;
+            player_lock_counter++;
+        } else {
+            key_pressed = KEY_NULL;
+            player_lock_counter = 0;
+        }
     } else {
         key_pressed = KEY_NULL;
+        player_lock_counter += 2;
     }
 
     if (key_pressed == KEY_NULL) {
         player_hitbox = player_default_hitbox;
         player_texture_rec.x = 0.0f;
+    }
+
+    if (player_lock_counter >= 40) {
+        game->player.locked = true;
+    }
+
+    if (player_lock_counter >= 90) {
+        player_lock_counter = 0;
+        game->player.locked = false;
     }
 
     // check if hit
@@ -474,6 +503,7 @@ void screen_game_deinit(Game *game)
     UnloadSound(hit_sound);
     UnloadMusicStream(music_normal);
     UnloadMusicStream(music_normal2);
+    UnloadMusicStream(music_normal3);
     UnloadMusicStream(music_insane);
 
     for (int i = 0; i < AMOUNT_BACKGROUNDS; i++) {

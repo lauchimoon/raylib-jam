@@ -359,7 +359,7 @@ void screen_title_draw(Game *game)
             DrawTexture(bg_texture, 0, 0, (Color){ 150, 150, 150, 255 });
 
             DrawText("Press Q to return", 10, GetScreenHeight() - 30, 20, WHITE);
-            DrawText("Dodge the punches using WASD. Hold the key\nin question to dodge a punch.", 10, 10, 30, WHITE);
+            DrawText("Dodge the punches using WASD. Hold to dodge, but\ndon't hold for too long!", 10, 10, 30, WHITE);
             DrawText("You will be warned where a fist will come from with\nthis symbol:", 10, 95, 30, WHITE);
             DrawText("For example, say the symbol is to your left.\nHold the D key to avoid the fist coming\nfrom the left.", 10, 185, 30, WHITE);
 

@@ -14,6 +14,7 @@ static const char *pro_tips[AMOUNT_PRO_TIPS] = {
     "Pro Tip: git gud",
     "Pro Tip: Be fast!",
     "Pro Tip: Dodge!",
+    "Pro Tip: Win!"
 };
 
 static bool show_score_won = false;

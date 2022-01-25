@@ -46,6 +46,8 @@ typedef struct Player {
     bool was_attacked;
     int attack_counter;
     bool lost;
+    int state;
+    bool locked;
     bool beat_insane; // WHAT?!?!??
 } Player;
 
