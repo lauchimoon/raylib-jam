@@ -5,6 +5,7 @@
 
 #define AMOUNT_BACKGROUNDS  4
 #define AMOUNT_MODES        4
+#define VERSION             1.1
 
 typedef enum {
     SCREEN_WAIT = 0,
@@ -74,6 +75,8 @@ void deinit_game(Game *game);
 void transition_out(Game *game);
 void transition_zero(void);
 bool transition_done(void);
+bool update_back_button(int x, int y, int width, int height);
+void draw_back_button(int x, int y);
 void run(void);
 
 void emsave(const char *key, int value);

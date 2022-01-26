@@ -32,7 +32,7 @@ void screen_wait_update(Game *game)
     if (frames_counter >= 10) {
         color.a -= 3;
     }
-    if (frames_counter >= 80) {
+    if (frames_counter >= 50) {
         switch (game->wait_situation) {
             case WS_GET_READY:
                 screen_move(SCREEN_GAME);

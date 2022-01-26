@@ -105,6 +105,12 @@ void screen_shop_init(Game *game)
 
 void screen_shop_update(Game *game)
 {
+    texture_x--;
+
+    if (texture_x <= -bg_texture.width) {
+        texture_x = 0;
+    }
+
     UpdateMusicStream(music);
 
     if (click_button(modes_bounds)) {
@@ -116,7 +122,7 @@ void screen_shop_update(Game *game)
         current_tab = TAB_BACKGROUNDS;
     }
 
-    if (IsKeyPressed(KEY_Q) && !move_to_title) {
+    if ((IsKeyPressed(KEY_Q) || update_back_button(window.x + 5, window.height - 50, 240, 64)) && !move_to_title) {
         emsave("tokens", game->player.tokens);
         StopMusicStream(music);
         PlaySound(start_sound);
@@ -178,11 +184,8 @@ void screen_shop_update(Game *game)
 
 void screen_shop_draw(Game *game)
 {
-    Rectangle src = { (float)texture_x, (float)texture_y, bg_texture.width, bg_texture.height };
-    Rectangle dst = { 0.0f, 0.0f, bg_texture.width, bg_texture.height };
-    Vector2 origin = { 0.0f, 0.0f };
-    float rotation = 0.0f;
-    DrawTexturePro(bg_texture, src, dst, origin, rotation, (Color){ 50, 50, 50, 255 });
+    DrawTexture(bg_texture, texture_x, texture_y, (Color){ 50, 50, 50, 255 });
+    DrawTexture(bg_texture, bg_texture.width + texture_x, texture_y, (Color){ 50, 50, 50, 255 });
 
     DrawRectangleRec(window, (Color){ 201, 215, 199, 255 });
     DrawRectangleLinesEx(window, 5, DARKGREEN);
@@ -196,8 +199,7 @@ void screen_shop_draw(Game *game)
     DrawText(tabs[0], modes_bounds.width/2, modes_bounds.height/2, 20, (current_tab == TAB_MODES)? LIME : DARKGREEN);
     DrawText(tabs[1], (bgs_bounds.x/2 + bgs_bounds.width/2) + 18, bgs_bounds.height/2, 20, (current_tab == TAB_BACKGROUNDS)? LIME : DARKGREEN);
 
-    DrawText(TextFormat("TOKENS: %d", game->player.tokens), window.x + 20, window.height - 20, 20, BLACK);
-    DrawText("Press Q to return", window.x + 20, window.height - 50, 20, BLACK);
+    draw_back_button(window.x + 5, window.height - 50);
 
     switch (current_tab) {
         case TAB_MODES:
@@ -234,6 +236,7 @@ void screen_shop_draw(Game *game)
 
     DrawTextCentered(items[current_item].description, (window.y + window.height) - 150, 20, BLACK);
     DrawText(TextFormat("PRICE: %d", items[current_item].price), (window.x + window.width) - 140, 40, 20, BLACK);
+    DrawText(TextFormat("TOKENS: %d", game->player.tokens), window.x + 260, window.height - 15, 20, BLACK);
 
     if (move_to_title) {
         game->wait_situation = WS_LOADING_TITLE;

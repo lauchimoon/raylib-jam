@@ -11,6 +11,8 @@
 
 static Texture transition_texture = { 0 };
 static Rectangle transition_texture_rec = { 0 };
+static Texture back_texture = { 0 };
+static Rectangle back_texture_rec = { 0 };
 
 void init_game(Game *game)
 {
@@ -42,11 +44,14 @@ void init_game(Game *game)
     game->frames_counter = 0;
     transition_texture = LoadTexture("assets/transition_animation.png");
     transition_texture_rec = (Rectangle){ 0.0f, 0.0f, transition_texture.width/TRANSITION_FRAMES, transition_texture.height };
+    back_texture = LoadTexture("assets/button_back.png");
+    back_texture_rec = (Rectangle){ 0.0f, 0.0f, 240.0f, 64.0f };
 }
 
 void deinit_game(Game *game)
 {
     UnloadTexture(transition_texture);
+    UnloadTexture(back_texture);
 }
 
 void transition_out(Game *game)
@@ -71,6 +76,26 @@ void transition_zero(void)
 bool transition_done(void)
 {
     return (transition_texture_rec.x == transition_texture.width);
+}
+
+bool update_back_button(int x, int y, int width, int height)
+{
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){ x, y, width, height })) {
+        back_texture_rec.x = 240.0f;
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            return true;
+        }
+    } else {
+        back_texture_rec.x = 0.0f;
+    }
+
+    return false;
+}
+
+void draw_back_button(int x, int y)
+{
+    DrawTextureRec(back_texture, back_texture_rec, (Vector2){ x, y }, WHITE);
 }
 
 void emsave(const char *key, int value)

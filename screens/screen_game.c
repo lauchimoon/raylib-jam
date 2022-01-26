@@ -87,6 +87,13 @@ static int player_lock_counter = 0;
 static Texture backgrounds[AMOUNT_BACKGROUNDS] = { 0 };
 static Music musics[3] = { 0 };
 
+static Rectangle up_event = { 0 };
+static Rectangle left_event = { 0 };
+static Rectangle down_event = { 0 };
+static Rectangle right_event = { 0 };
+
+static bool button_held(Rectangle bounds);
+
 void screen_game_init(Game *game)
 {
     // initialize values
@@ -221,6 +228,16 @@ void screen_game_init(Game *game)
     darkness.a = 0;
     game->player.state = STATE_IDLE;
     game->player.locked = false;
+
+    if (game->mode != MODE_SANDBOX) {
+        up_event = (Rectangle){ 0.0f, 0.0f, GetScreenWidth(), 150.0f };
+    } else {
+        up_event = (Rectangle){ 0.0f + 300.0f, 0.0f, GetScreenWidth(), 150.0f };
+    }
+
+    left_event = (Rectangle){ 0.0f, 150.0f, 160.0f, 150.0f };
+    down_event = (Rectangle){ 0.0f, GetScreenHeight() - 150.0f, GetScreenWidth(), 150.0f };
+    right_event = (Rectangle){ GetScreenWidth() - 160.0f, 150.0f, 160.0f, 150.0f };
 }
 
 void screen_game_update(Game *game)
@@ -233,25 +250,25 @@ void screen_game_update(Game *game)
 
     // player input
     if (!game->player.locked) {
-        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
+        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP) || button_held(up_event)) {
             player_hitbox.y = 75;
             player_hitbox.height = 65;
             key_pressed = KEY_W;
             player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*4;
             player_lock_counter++;
-        } else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
+        } else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT) || button_held(left_event)) {
             player_hitbox.x = 300;
             player_hitbox.width = 50;
             key_pressed = KEY_A;
             player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*2;
             player_lock_counter++;
-        } else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
+        } else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN) || button_held(down_event)) {
             player_hitbox.y = 305;
             player_hitbox.height = 50;
             player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*1;
             key_pressed = KEY_S;
             player_lock_counter++;
-        } else if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
+        } else if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT) || button_held(right_event)) {
             player_hitbox.x = 450;
             player_hitbox.width = 50;
             key_pressed = KEY_D;
@@ -327,7 +344,7 @@ void screen_game_update(Game *game)
         case 3400: frames_counter_cooldown = COOLDOWN - 9; break;
     }
 
-    if (IsKeyPressed(KEY_Q) && game->mode == MODE_SANDBOX) {
+    if ((IsKeyPressed(KEY_Q) || update_back_button(5, 5, 240, 64)) && game->mode == MODE_SANDBOX) {
         screen_move(SCREEN_TITLE);
     }
 
@@ -452,7 +469,7 @@ void screen_game_draw(Game *game)
             DrawText(TextFormat("LIVES: %d", game->player.lives), 10, 40, 30, WHITE);
         }
     } else {
-        DrawText("Press Q to return", 10, 10, 30, WHITE);
+        draw_back_button(5, 5);
         DrawText("Ouch!", 10, 40, 30, show_hit? WHITE : BLANK);
     }
 
@@ -509,5 +526,16 @@ void screen_game_deinit(Game *game)
     for (int i = 0; i < AMOUNT_BACKGROUNDS; i++) {
         UnloadTexture(backgrounds[i]);
     }
+}
+
+static bool button_held(Rectangle bounds)
+{
+    if (CheckCollisionPointRec(GetMousePosition(), bounds)) {
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 

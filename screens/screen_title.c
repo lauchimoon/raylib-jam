@@ -204,6 +204,10 @@ void screen_title_update(Game *game)
             move_to_game = true;
         }
 
+        if (update_back_button(5, GetScreenHeight() - 70, 240, 64)) {
+            game->title_ss = SS_MAIN;
+        }
+
         if (game->mode < MODE_SURVIVAL) {
             game->mode = MODE_INSANE;
         } else if (game->mode > MODE_INSANE) {
@@ -257,13 +261,27 @@ void screen_title_update(Game *game)
                 game->music_volume -= 0.01f;
             }
         }
+        
+        if (update_back_button(5, GetScreenHeight() - 70, 240, 64)) {
+            game->title_ss = SS_MAIN;
+        }
+    }
+
+    if (game->title_ss == SS_INSTRUCTIONS || game->title_ss == SS_CUSTOMIZE) {
+        if (update_back_button(5, GetScreenHeight() - 70, 240, 64)) {
+            game->title_ss -= 2;
+        }
     }
 
     if (IsKeyPressed(KEY_Q) && !move_to_game) {
         switch (game->title_ss) {
             case SS_MAIN: break;
-            case SS_CONFIG: game->title_ss--; break;
-            case SS_INSTRUCTIONS: case SS_CUSTOMIZE: game->title_ss -= 2; break;
+            case SS_CONFIG:
+                game->title_ss--;
+                break;
+            case SS_INSTRUCTIONS: case SS_CUSTOMIZE:
+                game->title_ss -= 2;
+                break;
             case SS_OPTIONS:
                 game->title_ss -= 4;
 #ifdef WEB
@@ -314,6 +332,7 @@ void screen_title_draw(Game *game)
             DrawTexture(fist_texture, GetRandomValue(-70, -65), GetRandomValue(GetScreenHeight()/2 - 50, GetScreenHeight()/2 - 45), WHITE);
             DrawText("Press DEL to delete your data", 10, GetScreenHeight() - 60, 20, BLACK);
             DrawText("Copyright (c) catmanl 2022", 10, GetScreenHeight() - 30, 20, BLACK);
+            DrawText(TextFormat("v%.1f", VERSION), GetScreenWidth() - 40, GetScreenHeight() - 30, 20, BLACK);
             DrawTextureRec(buttons_texture, button_play_render, (Vector2){ GetRandomValue(buttons[0].bounds.x - 2, buttons[0].bounds.x + 2), GetRandomValue(buttons[0].bounds.y - 2, buttons[0].bounds.y + 2) }, WHITE);
             DrawTextureRec(buttons_texture, button_shop_render, (Vector2){ GetRandomValue(buttons[1].bounds.x - 2, buttons[1].bounds.x + 2), GetRandomValue(buttons[1].bounds.y - 2, buttons[1].bounds.y + 2) }, WHITE);
             DrawTextureRec(buttons_texture, button_inst_render, (Vector2){ GetRandomValue(buttons[3].bounds.x - 2, buttons[3].bounds.x + 2), GetRandomValue(buttons[3].bounds.y - 2, buttons[3].bounds.y + 2) }, WHITE);
@@ -343,7 +362,7 @@ void screen_title_draw(Game *game)
             DrawTextCentered(mode_descriptions[game->mode], 180, 30, WHITE);
             DrawTextureRec(buttons_texture, button_go_render, (Vector2){ buttons[2].bounds.x, buttons[2].bounds.y }, WHITE);
             DrawTextureRec(buttons_texture, button_custom_render, (Vector2){ buttons[4].bounds.x, buttons[4].bounds.y }, WHITE);
-            DrawText("Press Q to return", 10, GetScreenHeight() - 30, 20, WHITE);
+            draw_back_button(5, GetScreenHeight() - 70);
 
             if (move_to_game) {
                 StopMusicStream(music);
@@ -358,7 +377,7 @@ void screen_title_draw(Game *game)
         case SS_INSTRUCTIONS:
             DrawTexture(bg_texture, 0, 0, (Color){ 150, 150, 150, 255 });
 
-            DrawText("Press Q to return", 10, GetScreenHeight() - 30, 20, WHITE);
+            draw_back_button(5, GetScreenHeight() - 70);
             DrawText("Dodge the punches using WASD. Hold to dodge, but\ndon't hold for too long!", 10, 10, 30, WHITE);
             DrawText("You will be warned where a fist will come from with\nthis symbol:", 10, 95, 30, WHITE);
             DrawText("For example, say the symbol is to your left.\nHold the D key to avoid the fist coming\nfrom the left.", 10, 185, 30, WHITE);
@@ -368,7 +387,6 @@ void screen_title_draw(Game *game)
             break;
         case SS_CUSTOMIZE:
             DrawTexture(bg_texture, 0, 0, (Color){ 150, 150, 150, 255 });
-            DrawText("Press Q to return", 10, GetScreenHeight() - 30, 20, WHITE);
 
             DrawTextureEx(bg_0_texture, (Vector2){ bg_0.x, bg_0.y }, 0.0f, 0.3f, game->unlocked_bg[0]? WHITE : DARKGRAY);
             DrawTextureEx(bg_1_texture, (Vector2){ bg_1.x, bg_1.y }, 0.0f, 0.3f, game->unlocked_bg[1]? WHITE : DARKGRAY);
@@ -385,11 +403,12 @@ void screen_title_draw(Game *game)
 
             DrawTextCentered("CUSTOMIZE", 20, 40, WHITE);
             DrawTextCentered("Choose your background", 70, 30, WHITE);
+            draw_back_button(5, GetScreenHeight() - 70);
             break;
         case SS_OPTIONS:
             DrawTexture(bg_texture, 0, 0, (Color){ 150, 150, 150, 255 });
             DrawTextCentered("OPTIONS", 20, 40, WHITE);
-            DrawText("Press Q to return", 10, GetScreenHeight() - 30, 20, WHITE);
+            draw_back_button(5, GetScreenHeight() - 70);
             DrawTextCentered("Master Volume", 90, 30, WHITE);
             DrawTextCentered(TextFormat("%.0f", game->volume*100), 140, 30, WHITE);
             DrawText("<", 290, 140, 30, WHITE);
