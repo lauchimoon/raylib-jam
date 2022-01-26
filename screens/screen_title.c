@@ -163,20 +163,20 @@ void screen_title_update(Game *game)
             game->title_ss = SS_OPTIONS;
         }
     } else if (game->title_ss == SS_CONFIG) {
-        if (click_button((Rectangle){ 480.0f, 120.0f, 48.0f, 48.0f })) {
+        if (click_button((Rectangle){ 480.0f, 120.0f, 48.0f, 48.0f }) && !move_to_game) {
             game->mode++;
             PlaySound(select_sound);
         }
-        if (click_button((Rectangle){ 275.0f, 120.0f, 48.0f, 48.0f })) {
+        if (click_button((Rectangle){ 275.0f, 120.0f, 48.0f, 48.0f }) && !move_to_game) {
             game->mode--;
             PlaySound(select_sound);
         }
 
-        if (IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)) {
+        if ((IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)) && !move_to_game) {
             game->mode++;
             PlaySound(select_sound);
         }
-        if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT)) {
+        if ((IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT)) && !move_to_game) {
             game->mode--;
             PlaySound(select_sound);
         }
@@ -190,7 +190,7 @@ void screen_title_update(Game *game)
             }
         }
 
-        if (CheckCollisionPointRec(GetMousePosition(), buttons[4].bounds)) {
+        if (CheckCollisionPointRec(GetMousePosition(), buttons[4].bounds) && !move_to_game) {
             button_custom_render.x = buttons_texture.width/2;
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 game->title_ss = SS_CUSTOMIZE;
