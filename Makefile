@@ -6,7 +6,7 @@ ifeq ($(PLATFORM), WEB)
 	CC = emcc
 	LDLIBS = -L lib/web/ -lraylib
 	OUT = build/web/index.html
-	CFLAGS = -Wall -D_DEFAULT_SOURCE -Os -s USE_GLFW=3 -s ASYNCIFY -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 -s DYNAMIC_EXECUTION=1 --preload-file assets --shell-file ../raylib/src/shell.html
+	CFLAGS = -Wall -D_DEFAULT_SOURCE -Os -s USE_GLFW=3 -s ASYNCIFY -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 -s DYNAMIC_EXECUTION=1 --preload-file assets --shell-file lib/minshell.html
 	DEFINE = -DWEB
 else
 	CC = gcc
