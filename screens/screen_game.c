@@ -275,9 +275,9 @@ void screen_game_update(Game *game)
         game->player.locked = true;
     }
 
-    if (player_lock_counter >= 90) {
-        player_lock_counter = 0;
+    if (player_lock_counter >= 60) {
         game->player.locked = false;
+        player_lock_counter = 0;
     }
 
     // check if hit
