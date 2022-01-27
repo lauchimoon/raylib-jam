@@ -264,6 +264,9 @@ void screen_title_update(Game *game)
         
         if (update_back_button(5, GetScreenHeight() - 70, 240, 64)) {
             game->title_ss = SS_MAIN;
+            emsave_f("master_volume", game->volume);
+            emsave_f("sound_volume", game->sound_volume);
+            emsave_f("music_volume", game->music_volume);
         }
     }
 
