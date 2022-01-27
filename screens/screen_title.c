@@ -153,7 +153,7 @@ void screen_title_update(Game *game)
             }
         }
 
-        if (IsKeyPressed(KEY_DELETE)) {
+        if (IsKeyPressed(KEY_DELETE) || update_delete_button(10, GetScreenHeight() - 70, 240, 64)) {
             reset_game_data(game);
             game->wait_situation = WS_LOGO;
             screen_move(SCREEN_WAIT);
@@ -333,8 +333,8 @@ void screen_title_draw(Game *game)
             DrawTexture(bg_texture, 0, 0, WHITE);
             DrawTexture(title_texture, GetRandomValue(-2, 2), GetRandomValue(-2, 2), WHITE);
             DrawTexture(fist_texture, GetRandomValue(-70, -65), GetRandomValue(GetScreenHeight()/2 - 50, GetScreenHeight()/2 - 45), WHITE);
-            DrawText("Press DEL to delete your data", 10, GetScreenHeight() - 60, 20, BLACK);
-            DrawText("Copyright (c) catmanl 2022", 10, GetScreenHeight() - 30, 20, BLACK);
+            draw_delete_button(10, GetScreenHeight() - 70);
+            DrawText("Copyright (c) catmanl 2022", 240 + 20, GetScreenHeight() - 30, 20, BLACK);
             DrawText(TextFormat("v%.1f", VERSION), GetScreenWidth() - 40, GetScreenHeight() - 30, 20, BLACK);
             DrawTextureRec(buttons_texture, button_play_render, (Vector2){ GetRandomValue(buttons[0].bounds.x - 2, buttons[0].bounds.x + 2), GetRandomValue(buttons[0].bounds.y - 2, buttons[0].bounds.y + 2) }, WHITE);
             DrawTextureRec(buttons_texture, button_shop_render, (Vector2){ GetRandomValue(buttons[1].bounds.x - 2, buttons[1].bounds.x + 2), GetRandomValue(buttons[1].bounds.y - 2, buttons[1].bounds.y + 2) }, WHITE);

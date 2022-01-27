@@ -76,7 +76,9 @@ void transition_out(Game *game);
 void transition_zero(void);
 bool transition_done(void);
 bool update_back_button(int x, int y, int width, int height);
+bool update_delete_button(int x, int y, int width, int height);
 void draw_back_button(int x, int y);
+void draw_delete_button(int x, int y);
 void run(void);
 
 void emsave(const char *key, int value);

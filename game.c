@@ -13,6 +13,8 @@ static Texture transition_texture = { 0 };
 static Rectangle transition_texture_rec = { 0 };
 static Texture back_texture = { 0 };
 static Rectangle back_texture_rec = { 0 };
+static Texture delete_texture = { 0 };
+static Rectangle delete_texture_rec = { 0 };
 
 void init_game(Game *game)
 {
@@ -46,12 +48,15 @@ void init_game(Game *game)
     transition_texture_rec = (Rectangle){ 0.0f, 0.0f, transition_texture.width/TRANSITION_FRAMES, transition_texture.height };
     back_texture = LoadTexture("assets/button_back.png");
     back_texture_rec = (Rectangle){ 0.0f, 0.0f, 240.0f, 64.0f };
+    delete_texture = LoadTexture("assets/button_delete.png");
+    delete_texture_rec = (Rectangle){ 0.0f, 0.0f, 240.0f, 64.0f };
 }
 
 void deinit_game(Game *game)
 {
     UnloadTexture(transition_texture);
     UnloadTexture(back_texture);
+    UnloadTexture(delete_texture);
 }
 
 void transition_out(Game *game)
@@ -96,6 +101,26 @@ bool update_back_button(int x, int y, int width, int height)
 void draw_back_button(int x, int y)
 {
     DrawTextureRec(back_texture, back_texture_rec, (Vector2){ x, y }, WHITE);
+}
+
+bool update_delete_button(int x, int y, int width, int height)
+{
+    if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){ x, y, width, height })) {
+        delete_texture_rec.x = 240.0f;
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            return true;
+        }
+    } else {
+        delete_texture_rec.x = 0.0f;
+    }
+
+    return false;
+}
+
+void draw_delete_button(int x, int y)
+{
+    DrawTextureRec(delete_texture, delete_texture_rec, (Vector2){ x, y }, WHITE);
 }
 
 void emsave(const char *key, int value)
