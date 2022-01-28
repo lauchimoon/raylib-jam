@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "raylib.h"
+#include <stdio.h>
 
 #define AMOUNT_BUTTONS      5
 
@@ -48,6 +49,8 @@ static const char *mode_descriptions[AMOUNT_MODES] = {
     "You don't take damage. Great for practicing!",
     "You're not told when a fist will\ncome at you. Survive for a minute!"
 };
+
+static int option_chosen = 0;
 
 static void DrawTextCentered(const char *text, int y, int fontSize, Color color);
 static const char *get_mode_as_str(Game *game);
@@ -153,7 +156,7 @@ void screen_title_update(Game *game)
             }
         }
 
-        if (IsKeyPressed(KEY_DELETE) || update_delete_button(10, GetScreenHeight() - 70, 240, 64)) {
+        if (IsKeyPressed(KEY_DELETE) || update_delete_button(10, GetScreenHeight() - 70, 240, 64) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_TRIGGER_1)) {
             reset_game_data(game);
             game->wait_situation = WS_LOGO;
             screen_move(SCREEN_WAIT);
@@ -161,6 +164,33 @@ void screen_title_update(Game *game)
 
         if (click_button((Rectangle){ GetScreenWidth() - gear_texture.width, 10, gear_texture.width, gear_texture.height })) {
             game->title_ss = SS_OPTIONS;
+        }
+
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
+            option_chosen--;
+        } else if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN) || IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
+            option_chosen++;
+        }
+
+        if (option_chosen < 0) {
+            option_chosen = 2;
+        }
+        if (option_chosen > 2) {
+            option_chosen = 0;
+        }
+
+        switch (option_chosen) {
+            case 0: button_play_render.x = 240.0f; break;
+            case 1: button_shop_render.x = 240.0f; break;
+            case 2: button_inst_render.x = 240.0f; break;
+        }
+
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) || IsKeyPressed(KEY_SPACE)) {
+            switch (option_chosen) {
+                case 0: game->title_ss = SS_CONFIG; PlaySound(select_sound); option_chosen = 0; break;
+                case 1: PlaySound(start_sound); transition_zero(); move_to_shop = true; break;
+                case 2: game->title_ss = SS_INSTRUCTIONS; PlaySound(select_sound); break;
+            }
         }
     } else if (game->title_ss == SS_CONFIG) {
         if (click_button((Rectangle){ 480.0f, 120.0f, 48.0f, 48.0f }) && !move_to_game) {
@@ -172,11 +202,11 @@ void screen_title_update(Game *game)
             PlaySound(select_sound);
         }
 
-        if ((IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)) && !move_to_game) {
+        if ((IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) && !move_to_game) {
             game->mode++;
             PlaySound(select_sound);
         }
-        if ((IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT)) && !move_to_game) {
+        if ((IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) && !move_to_game) {
             game->mode--;
             PlaySound(select_sound);
         }
@@ -197,11 +227,35 @@ void screen_title_update(Game *game)
                 PlaySound(select_sound);
             }
         }
+        
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
+            option_chosen--;
+        } else if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN) || IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
+            option_chosen++;
+        }
 
-        if (IsKeyPressed(KEY_SPACE) && !move_to_game && game->unlocked_modes[game->mode]) {
-            PlaySound(start_sound);
-            transition_zero();
-            move_to_game = true;
+        if (option_chosen < 0) {
+            option_chosen = 1;
+        }
+        if (option_chosen > 1) {
+            option_chosen = 0;
+        }
+
+        switch (option_chosen) {
+            case 0: button_custom_render.x = 240.0f; break;
+            case 1: button_go_render.x = 240.0f; break;
+        }
+
+        if ((IsKeyPressed(KEY_SPACE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) && !move_to_game && game->unlocked_modes[game->mode]) {
+            switch (option_chosen) {
+                case 0: game->title_ss = SS_CUSTOMIZE; break;
+                case 1:
+                    PlaySound(start_sound);
+                    transition_zero();
+                    move_to_game = true;
+                    break;
+                default: break;
+            }
         }
 
         if (update_back_button(5, GetScreenHeight() - 70, 240, 64)) {
@@ -276,17 +330,20 @@ void screen_title_update(Game *game)
         }
     }
 
-    if (IsKeyPressed(KEY_Q) && !move_to_game) {
+    if ((IsKeyPressed(KEY_Q) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) && !move_to_game) {
         switch (game->title_ss) {
             case SS_MAIN: break;
             case SS_CONFIG:
                 game->title_ss--;
+                PlaySound(select_sound);
                 break;
             case SS_INSTRUCTIONS: case SS_CUSTOMIZE:
                 game->title_ss -= 2;
+                PlaySound(select_sound);
                 break;
             case SS_OPTIONS:
                 game->title_ss -= 4;
+                PlaySound(select_sound);
 #ifdef WEB
                 emsave_f("master_volume", game->volume);
                 emsave_f("sound_volume", game->sound_volume);
@@ -295,10 +352,7 @@ void screen_title_update(Game *game)
                 break;
             default: break;
         }
-
-        if (game->title_ss != SS_MAIN) {
-            PlaySound(select_sound);
-        }
+        option_chosen = 0;
     }
 
     bg_0 = (Rectangle){ 100.0f, 120.0f, 240.0f, 135.0f };

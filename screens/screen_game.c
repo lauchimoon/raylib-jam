@@ -250,25 +250,25 @@ void screen_game_update(Game *game)
 
     // player input
     if (!game->player.locked) {
-        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP) || button_held(up_event)) {
+        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP) || button_held(up_event) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) == -1 || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
             player_hitbox.y = 75;
             player_hitbox.height = 65;
             key_pressed = KEY_W;
             player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*4;
             player_lock_counter++;
-        } else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT) || button_held(left_event)) {
+        } else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT) || button_held(left_event) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) == -1 || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
             player_hitbox.x = 300;
             player_hitbox.width = 50;
             key_pressed = KEY_A;
             player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*2;
             player_lock_counter++;
-        } else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN) || button_held(down_event)) {
+        } else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN) || button_held(down_event) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) == 1 || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
             player_hitbox.y = 305;
             player_hitbox.height = 50;
             player_texture_rec.x = (player_texture.width/AMOUNT_PLAYER_STATES)*1;
             key_pressed = KEY_S;
             player_lock_counter++;
-        } else if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT) || button_held(right_event)) {
+        } else if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT) || button_held(right_event) || GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) == 1 || IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
             player_hitbox.x = 450;
             player_hitbox.width = 50;
             key_pressed = KEY_D;
@@ -344,7 +344,7 @@ void screen_game_update(Game *game)
         case 3400: frames_counter_cooldown = COOLDOWN - 9; break;
     }
 
-    if ((IsKeyPressed(KEY_Q) || update_back_button(5, 5, 240, 64)) && game->mode == MODE_SANDBOX) {
+    if ((IsKeyPressed(KEY_Q) || update_back_button(5, 5, 240, 64) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) && game->mode == MODE_SANDBOX) {
         screen_move(SCREEN_TITLE);
     }
 

@@ -113,16 +113,17 @@ void screen_shop_update(Game *game)
 
     UpdateMusicStream(music);
 
-    if (click_button(modes_bounds)) {
+    if (click_button(modes_bounds) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_TRIGGER_1) || IsKeyPressed(KEY_H)) {
         PlaySound(select_sound);
         current_tab = TAB_MODES;
     }
-    if (click_button(bgs_bounds)) {
+    if (click_button(bgs_bounds) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_TRIGGER_1) || IsKeyPressed(KEY_L)) {
         PlaySound(select_sound);
         current_tab = TAB_BACKGROUNDS;
     }
 
-    if ((IsKeyPressed(KEY_Q) || update_back_button(window.x + 5, window.height - 50, 240, 64)) && !move_to_title) {
+
+    if ((IsKeyPressed(KEY_Q) || update_back_button(window.x + 5, window.height - 50, 240, 64) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) && !move_to_title) {
         emsave("tokens", game->player.tokens);
         StopMusicStream(music);
         PlaySound(start_sound);
@@ -147,11 +148,23 @@ void screen_shop_update(Game *game)
                 current_item = 1;
             }
 
-            if (click_button(sandbox) && game->player.tokens >= items[0].price && !game->unlocked_modes[MODE_SANDBOX]) {
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) {
+                current_item--;
+            } else if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT) || IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) {
+                current_item++;
+            }
+
+            if (current_item < 0) {
+                current_item = 1;
+            } else if (current_item > 1) {
+                current_item = 0;
+            }
+
+            if ((click_button(sandbox) || (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) && current_item == 0) || (IsKeyPressed(KEY_SPACE) && current_item == 0)) && game->player.tokens >= items[0].price && !game->unlocked_modes[MODE_SANDBOX]) {
                 buy(game, 0);
                 game->player.tokens -= items[0].price;
             }
-            if (click_button(insane) && game->player.tokens >= items[1].price && !game->unlocked_modes[MODE_INSANE]) {
+            if ((click_button(insane) || (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) && current_item == 1) || (IsKeyPressed(KEY_SPACE) && current_item == 1)) && game->player.tokens >= items[1].price && !game->unlocked_modes[MODE_INSANE]) {
                 buy(game, 1);
                 game->player.tokens -= items[1].price;
             }
@@ -165,15 +178,27 @@ void screen_shop_update(Game *game)
                 current_item = 4;
             }
 
-            if (click_button(out) && game->player.tokens >= items[2].price && !game->unlocked_bg[1]) {
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) {
+                current_item--;
+            } else if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT) || IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) {
+                current_item++;
+            }
+
+            if (current_item < 2) {
+                current_item = 4;
+            } else if (current_item > 4) {
+                current_item = 2;
+            }
+
+            if ((click_button(out) || (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) && current_item == 2) || (IsKeyPressed(KEY_SPACE) && current_item == 2)) && game->player.tokens >= items[2].price && !game->unlocked_bg[1]) {
                 buy(game, 2);
                 game->player.tokens -= items[2].price;
             }
-            if (click_button(mc) && game->player.tokens >= items[3].price && !game->unlocked_bg[2]) {
+            if ((click_button(mc) || (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) && current_item == 3) || (IsKeyPressed(KEY_SPACE) && current_item == 3)) && game->player.tokens >= items[3].price && !game->unlocked_bg[2]) {
                 buy(game, 3);
                 game->player.tokens -= items[3].price;
             }
-            if (click_button(beach) && game->player.tokens >= items[4].price && !game->unlocked_bg[3]) {
+            if ((click_button(beach) || (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) && current_item == 4) || (IsKeyPressed(KEY_SPACE) && current_item == 4)) && game->player.tokens >= items[4].price && !game->unlocked_bg[3]) {
                 buy(game, 4);
                 game->player.tokens -= items[4].price;
             }
