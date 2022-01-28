@@ -5,7 +5,7 @@
 
 #define AMOUNT_BACKGROUNDS  4
 #define AMOUNT_MODES        4
-#define VERSION             1.1
+#define VERSION             1.2
 
 typedef enum {
     SCREEN_WAIT = 0,
